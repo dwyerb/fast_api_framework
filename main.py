@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Path, Query
 from enum import Enum
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 
@@ -17,6 +17,18 @@ class ModelName(str, Enum):
     alexnet = 'alexnet'
     resnet = 'resnet'
     lenet = 'lenet'
+
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    full_name: Optional[str] = None
+
+
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: Optional[str] = None
 
 fake_db = [{'item_name':'foo'},{'item_name':'bar'},{'item_name':'kate'},{'item_name':'barry'}]
 
@@ -56,3 +68,7 @@ async def create_item(item: Item):
 @app.post("/stuff/{item_id}")
 async def create_item(item_id: int, item: Item):
     return {"item_id": item_id, **item.dict()}
+
+@app.post("/user/", response_model=UserOut)
+async def create_user(user: UserIn):
+    return user
