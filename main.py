@@ -47,6 +47,6 @@ async def get_model(model_name: ModelName):
 async def read_item(skip: int =0, limit: int=10):
     return fake_db[skip: skip + limit]
 
-@app.post("/stuff/")
-async def create_item(item: Item):
-    return item
+@app.post("/stuff/{item_id}")
+async def create_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.dict()}
