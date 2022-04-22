@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 from enum import Enum
 from typing import Optional, List
 from pydantic import BaseModel
@@ -26,13 +26,12 @@ async  def root():
 
 @app.get("/items/{item_id}")
 async def read_item(item_id: str, q: Optional[str] = None, short: bool = False):
-    item = {"item_id": item_id}
+    item = int = Path(..., title="The ID of the item to get")
+    q: Optional[str] = Query(None, alias="item-query")
+    results = {"item_id": item_id}
     if q:
-        item.update({'q':q})
-    if not short:
-        item.update({"description": "This is an amazing item that has a long description"})
-    return item
-
+        results.update({"q": q})
+    return results
 @app.get("/models/{model_name}")
 async def get_model(model_name: ModelName):
     if model_name == ModelName.alexnet:
@@ -49,6 +48,10 @@ async def read_item(q: Optional[List[str]] = Query(None, max_length=50)):
     if q:
         results.update({"q": q})
     return results
+
+@app.post("/items/", response_model=Item)
+async def create_item(item: Item):
+    return item
 
 @app.post("/stuff/{item_id}")
 async def create_item(item_id: int, item: Item):
