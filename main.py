@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, status
 from enum import Enum
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
@@ -44,6 +44,11 @@ async def read_item(item_id: str, q: Optional[str] = None, short: bool = False):
     if q:
         results.update({"q": q})
     return results
+
+@app.get("/tests/{test_id}")
+async def get_test(test_id: int):
+    return {"test_id": test_id}
+
 @app.get("/models/{model_name}")
 async def get_model(model_name: ModelName):
     if model_name == ModelName.alexnet:
@@ -61,7 +66,7 @@ async def read_item(q: Optional[List[str]] = Query(None, max_length=50)):
         results.update({"q": q})
     return results
 
-@app.post("/items/", response_model=Item)
+@app.post("/items/", response_model=Item, status_code=status.HTTP_200_OK)
 async def create_item(item: Item):
     return item
 
@@ -69,6 +74,6 @@ async def create_item(item: Item):
 async def create_item(item_id: int, item: Item):
     return {"item_id": item_id, **item.dict()}
 
-@app.post("/user/", response_model=UserOut)
+@app.post("/user/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserIn):
     return user
